@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-cloud.ps1",
+    "supabase:link-push": "powershell -ExecutionPolicy Bypass -File ./scripts/link-and-push.ps1",
+    "supabase:push": "supabase db push",
+    "supabase:bootstrap": "node ./scripts/bootstrap-demo.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -22,6 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "supabase": "^2.117.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

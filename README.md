@@ -8,28 +8,20 @@ Architectural decisions are documented in [`/decisions`](./decisions/README.md).
 
 ## Quick start
 
-### 1. Supabase project
+### 1. Supabase (automated)
 
-1. Create a project at [supabase.com](https://supabase.com) (free tier).
-2. In **SQL Editor**, run [`supabase/schema.sql`](./supabase/schema.sql).
-3. Enable email auth under **Authentication → Providers**.
-4. Create a shop owner user, then link them:
+Create a [Supabase access token](https://supabase.com/dashboard/account/tokens), then from the repo root:
 
-```sql
-insert into shops (slug, name, whatsapp_number, location, description, owner_id)
-values (
-  'demo-sarees',
-  'Demo Saree Palace',
-  '+919876543210',
-  'Chennai',
-  'Handpicked sarees.',
-  '<auth-user-uuid>'
-);
+```powershell
+$env:SUPABASE_ACCESS_TOKEN = "sbp_your_token"
+npm run supabase:setup
 ```
 
-### 2. Environment
+This creates/links project `silkpanda-mvp`, applies migrations, writes `.env.local`, and seeds a demo shop owner + `demo-sarees` catalog. Details: [`supabase/SETUP.md`](./supabase/SETUP.md).
 
-Copy `.env.local.example` to `.env.local` and fill in your Supabase URL and anon key.
+**Manual alternative:** run [`supabase/schema.sql`](./supabase/schema.sql) in the SQL Editor, copy keys into `.env.local`, then `npm run supabase:bootstrap`.
+
+### 2. Environment
 
 ### 3. Run locally
 

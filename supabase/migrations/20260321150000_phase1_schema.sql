@@ -1,8 +1,5 @@
--- SilkPanda Phase 1 schema (mirror of supabase/migrations/20260321150000_phase1_schema.sql)
--- Prefer: npm run supabase:setup  OR  npx supabase db push
--- Manual: paste into Supabase SQL Editor. See supabase/SETUP.md
+-- SilkPanda Phase 1 schema (see decisions/ADR-0003-supabase-backend.md)
 
--- Shops
 create table shops (
   id uuid primary key default gen_random_uuid(),
   slug text unique not null,
@@ -14,7 +11,6 @@ create table shops (
   created_at timestamptz default now()
 );
 
--- Products
 create table products (
   id uuid primary key default gen_random_uuid(),
   shop_id uuid references shops(id) on delete cascade not null,
@@ -28,7 +24,6 @@ create table products (
   updated_at timestamptz default now()
 );
 
--- Events (product views and inquiries)
 create table events (
   id uuid primary key default gen_random_uuid(),
   type text not null check (type in ('view', 'inquiry')),
@@ -37,7 +32,6 @@ create table events (
   created_at timestamptz default now()
 );
 
--- Auto-update products.updated_at
 create or replace function update_updated_at()
 returns trigger as $$
 begin
@@ -50,12 +44,10 @@ create trigger products_updated_at
   before update on products
   for each row execute function update_updated_at();
 
--- Row Level Security
 alter table shops enable row level security;
 alter table products enable row level security;
 alter table events enable row level security;
 
--- Public storefront reads
 create policy "Public read shops"
   on shops for select using (true);
 
@@ -65,14 +57,12 @@ create policy "Public read products"
 create policy "Public insert events"
   on events for insert with check (true);
 
--- Shop owners manage their own shop
 create policy "Owners read own shop"
   on shops for select using (auth.uid() = owner_id);
 
 create policy "Owners update own shop"
   on shops for update using (auth.uid() = owner_id);
 
--- Shop owners manage their products
 create policy "Owners insert own products"
   on products for insert
   with check (
@@ -91,14 +81,12 @@ create policy "Owners delete own products"
     shop_id in (select id from shops where owner_id = auth.uid())
   );
 
--- Shop owners read their analytics events
 create policy "Owners read own events"
   on events for select
   using (
     shop_id in (select id from shops where owner_id = auth.uid())
   );
 
--- Storage bucket (also create via Dashboard: Storage > New bucket > product-images, public)
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
 on conflict (id) do nothing;
