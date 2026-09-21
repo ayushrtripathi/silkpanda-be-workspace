@@ -1,0 +1,13 @@
+-- Optional seed data for local/dev testing.
+-- Replace owner_id with a real auth.users id after creating a shop owner account.
+
+-- Example (uncomment and set owner_id after signup):
+-- insert into shops (slug, name, whatsapp_number, location, description, owner_id)
+-- values (
+--   'demo-sarees',
+--   'Demo Saree Palace',
+--   '+919876543210',
+--   'Chennai, Tamil Nadu',
+--   'Handpicked Kanjeevaram and Banarasi sarees.',
+--   '00000000-0000-0000-0000-000000000000'
+-- );
