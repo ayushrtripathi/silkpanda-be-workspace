@@ -4,6 +4,7 @@ export const RESERVED_SLUGS = new Set([
   "api",
   "admin",
   "auth",
+  "prototype",
   "favicon.ico",
   "_next",
 ]);

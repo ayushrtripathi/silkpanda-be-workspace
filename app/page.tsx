@@ -38,6 +38,12 @@ export default function Home() {
           >
             Shop owner dashboard
           </Link>
+          <Link
+            href="/prototype/discovery"
+            className="rounded-xl border border-amber-200 bg-amber-50 px-6 py-3 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+          >
+            Marketplace demo
+          </Link>
           <a
             href="https://github.com/ayushrtripathi/silkpanda-be-workspace"
             target="_blank"

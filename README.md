@@ -4,7 +4,7 @@ Backend component of SkillPanda (a Swiggy for saree shops): a shop-enablement we
 
 **Stack:** Next.js (App Router) · Tailwind CSS · Supabase (Postgres, Auth, Storage)
 
-Architectural decisions are documented in [`/decisions`](./decisions/README.md).
+Architecture decisions (ADR-0001–0010) live in [`decisions/`](./decisions/README.md).
 
 ## Quick start
 

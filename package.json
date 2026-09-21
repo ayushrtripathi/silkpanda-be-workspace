@@ -10,7 +10,8 @@
     "supabase:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-cloud.ps1",
     "supabase:link-push": "powershell -ExecutionPolicy Bypass -File ./scripts/link-and-push.ps1",
     "supabase:push": "supabase db push",
-    "supabase:bootstrap": "node ./scripts/bootstrap-demo.mjs"
+    "supabase:bootstrap": "node ./scripts/bootstrap-demo.mjs",
+    "supabase:seed-discovery": "node ./scripts/seed-discovery-shops.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
