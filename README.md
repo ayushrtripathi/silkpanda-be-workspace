@@ -1,6 +1,6 @@
 # SilkPanda — Phase 1 MVP
 
-Backend + web app for **SkillPanda / SilkPanda**: a shop-enablement platform where each saree shop gets a branded storefront (`silkpanda.com/<shop-slug>`). Buyers browse and enquire via WhatsApp — no payments, no cross-shop search in Phase 1.
+Backend component of SkillPanda (a Swiggy for saree shops): a shop-enablement web app where each saree shop gets a branded storefront (`silkpanda.com/<shop-slug>`). Buyers browse and enquire via WhatsApp — no payments, no cross-shop search in Phase 1.
 
 **Stack:** Next.js (App Router) · Tailwind CSS · Supabase (Postgres, Auth, Storage)
 
