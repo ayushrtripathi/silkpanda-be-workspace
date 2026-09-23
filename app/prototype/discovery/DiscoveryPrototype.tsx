@@ -4,12 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChatDrawer } from "@/components/prototype/ChatDrawer";
+import { FeedPost } from "@/components/prototype/FeedPost";
 import { DUMMY_POSTS, DUMMY_SHOPS } from "@/lib/prototype/discovery-data";
 import {
   getFollowedShopIds,
   setFollowedShopIds,
   toggleFollowedShop,
 } from "@/lib/prototype/follow-storage";
+import {
+  getLikedProductIds,
+  setLikedProductIds,
+  toggleLikedProduct,
+} from "@/lib/prototype/like-storage";
 import { placeholderForFabric } from "@/lib/prototype/placeholders";
 import {
   cityFromLocation,
@@ -19,12 +25,12 @@ import {
   type DiscoveryShopFeed,
 } from "@/lib/prototype/discovery-types";
 
-const PAGE_SIZE = 4;
+/** Single-column feed shows fewer items per viewport (ADR-0011). */
+const PAGE_SIZE = 3;
 
 interface DiscoveryPrototypeProps {
   shops: DiscoveryShopFeed[];
   posts: DiscoveryPostFeed[];
-  seededInDatabase: boolean;
 }
 
 type FeedTab = "all" | "following";
@@ -32,7 +38,6 @@ type FeedTab = "all" | "following";
 export function DiscoveryPrototype({
   shops: dbShops,
   posts: dbPosts,
-  seededInDatabase,
 }: DiscoveryPrototypeProps) {
   const shops = useMemo(() => {
     if (dbShops.length > 0) return dbShops;
@@ -67,13 +72,15 @@ export function DiscoveryPrototype({
   const [followedIds, setFollowedIds] = useState<string[]>(() =>
     typeof window !== "undefined" ? getFollowedShopIds() : [],
   );
+  const [likedIds, setLikedIds] = useState<string[]>(() =>
+    typeof window !== "undefined" ? getLikedProductIds() : [],
+  );
   const [page, setPage] = useState(1);
   const [chatShop, setChatShop] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setFollowedIds(getFollowedShopIds());
-    setHydrated(true);
+    setLikedIds(getLikedProductIds());
   }, []);
 
   const filteredPosts = useMemo(() => {
@@ -110,6 +117,10 @@ export function DiscoveryPrototype({
     setFollowedIds(toggleFollowedShop(shopId));
   }, []);
 
+  const onToggleLike = useCallback((productId: string) => {
+    setLikedIds(toggleLikedProduct(productId));
+  }, []);
+
   useEffect(() => {
     setPage(1);
   }, [feedTab, city, query]);
@@ -117,7 +128,7 @@ export function DiscoveryPrototype({
   const followingCount = followedIds.length;
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5]">
+    <div className="min-h-screen bg-stone-100">
       {/* Top bar — Marketplace-style */}
       <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-white shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
@@ -162,35 +173,31 @@ export function DiscoveryPrototype({
 
         {/* Location — only on All tab */}
         {feedTab === "all" && (
-          <div className="mx-auto max-w-5xl border-t border-stone-100 px-4 py-2">
-            <p className="mb-1.5 text-xs font-medium text-stone-500">Location</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-              <LocationChip
-                label="All areas"
-                active={city === "All"}
-                onClick={() => setCity("All")}
-              />
+          <div className="mx-auto flex max-w-5xl items-center gap-3 border-t border-stone-100 px-4 py-3">
+            <label
+              htmlFor="discovery-location"
+              className="shrink-0 text-sm font-medium text-stone-600"
+            >
+              Location
+            </label>
+            <select
+              id="discovery-location"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-800 shadow-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+            >
+              <option value="All">All areas</option>
               {DISCOVERY_CITIES.map((c) => (
-                <LocationChip
-                  key={c}
-                  label={c}
-                  active={city === c}
-                  onClick={() => setCity(c)}
-                />
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         )}
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-4 pb-20">
-        <p className="mb-4 text-xs text-stone-500">
-          {seededInDatabase
-            ? "Live listings from seeded Supabase shops."
-            : "Run npm run supabase:seed-discovery for live data."}
-          {hydrated && " Follows saved in localStorage on this device."}
-        </p>
-
         {/* Shop strip */}
         <section className="mb-6">
           <h2 className="mb-2 text-sm font-semibold text-stone-800">
@@ -237,14 +244,14 @@ export function DiscoveryPrototype({
           </div>
         </section>
 
-        {/* Grid feed */}
-        <section>
-          <div className="mb-3 flex items-end justify-between">
+        {/* Single-column feed (ADR-0011) */}
+        <section className="mx-auto max-w-lg">
+          <div className="mb-3 flex items-end justify-between px-0.5">
             <h2 className="text-lg font-bold text-stone-900">
-              {feedTab === "following" ? "From shops you follow" : "Today's picks"}
+              {feedTab === "following" ? "Following" : "For you"}
             </h2>
             <span className="text-sm text-stone-500">
-              {filteredPosts.length} item{filteredPosts.length === 1 ? "" : "s"}
+              {filteredPosts.length} post{filteredPosts.length === 1 ? "" : "s"}
             </span>
           </div>
 
@@ -265,17 +272,18 @@ export function DiscoveryPrototype({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <ul className="flex flex-col gap-5">
             {visiblePosts.map((post) => (
-              <MarketplaceCard
-                key={post.id}
-                post={post}
-                isFollowing={followedIds.includes(post.shopId)}
-                onChat={() => setChatShop(post.shopName)}
-                onFollowShop={() => onToggleFollow(post.shopId)}
-              />
+              <li key={post.id}>
+                <FeedPost
+                  post={post}
+                  liked={likedIds.includes(post.id)}
+                  onToggleLike={() => onToggleLike(post.id)}
+                  onMessage={() => setChatShop(post.shopName)}
+                />
+              </li>
             ))}
-          </div>
+          </ul>
 
           {filteredPosts.length === 0 &&
             !(feedTab === "following" && followedIds.length === 0) && (
@@ -296,16 +304,28 @@ export function DiscoveryPrototype({
         </section>
 
         {process.env.NODE_ENV === "development" && (
-          <button
-            type="button"
-            onClick={() => {
-              setFollowedShopIds([]);
-              setFollowedIds([]);
-            }}
-            className="mt-8 text-xs text-stone-400 underline"
-          >
-            Reset follows (dev)
-          </button>
+          <div className="mx-auto mt-8 flex max-w-lg gap-4 text-xs text-stone-400">
+            <button
+              type="button"
+              onClick={() => {
+                setFollowedShopIds([]);
+                setFollowedIds([]);
+              }}
+              className="underline"
+            >
+              Reset follows (dev)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLikedProductIds([]);
+                setLikedIds([]);
+              }}
+              className="underline"
+            >
+              Reset likes (dev)
+            </button>
+          </div>
         )}
       </main>
 
@@ -348,103 +368,5 @@ function SegmentTab({
         {count}
       </span>
     </button>
-  );
-}
-
-function LocationChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition active:scale-95 ${
-        active
-          ? "bg-sky-600 text-white shadow-md"
-          : "bg-white text-stone-700 shadow-sm ring-1 ring-stone-200 hover:bg-stone-50"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function MarketplaceCard({
-  post,
-  isFollowing,
-  onChat,
-  onFollowShop,
-}: {
-  post: DiscoveryPostFeed;
-  isFollowing: boolean;
-  onChat: () => void;
-  onFollowShop: () => void;
-}) {
-  const image =
-    post.imageUrl ?? placeholderForFabric(post.fabric);
-
-  return (
-    <article className="group overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-stone-200/80 transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="relative aspect-square overflow-hidden bg-stone-100">
-        <Image
-          src={image}
-          alt={post.title}
-          fill
-          className="object-cover transition duration-300 group-hover:scale-105"
-          sizes="(max-width: 640px) 50vw, 25vw"
-        />
-        {post.price != null && (
-          <span className="absolute bottom-2 left-2 rounded-md bg-white/95 px-2 py-0.5 text-sm font-bold text-stone-900 shadow">
-            ₹{post.price.toLocaleString("en-IN")}
-          </span>
-        )}
-      </div>
-      <div className="p-2.5">
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-stone-900">
-          {post.title}
-        </h3>
-        <p className="mt-1 truncate text-xs text-stone-500">
-          {cityFromLocation(post.location)} · {post.shopName}
-        </p>
-        {post.fabric && (
-          <p className="mt-0.5 text-[11px] text-stone-400">{post.fabric}</p>
-        )}
-        <div className="mt-2 grid grid-cols-2 gap-1.5">
-          <button
-            type="button"
-            onClick={onChat}
-            className="rounded-lg bg-sky-600 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-700 active:scale-95"
-          >
-            Message
-          </button>
-          {post.shopSlug ? (
-            <Link
-              href={`/${post.shopSlug}`}
-              className="rounded-lg border border-stone-200 py-1.5 text-center text-xs font-semibold text-stone-700 transition hover:bg-stone-50"
-            >
-              View
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={onFollowShop}
-              className={`rounded-lg py-1.5 text-xs font-semibold ${
-                isFollowing
-                  ? "bg-stone-100 text-stone-600"
-                  : "border border-stone-200 text-stone-700"
-              }`}
-            >
-              {isFollowing ? "Following" : "Follow"}
-            </button>
-          )}
-        </div>
-      </div>
-    </article>
   );
 }

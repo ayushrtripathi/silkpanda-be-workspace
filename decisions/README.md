@@ -23,6 +23,7 @@ This folder tracks major product, business, and technical decisions for SilkPand
 | [0008](0008-repo-structure.md) | Repository structure: single repo | Accepted |
 | [0009](0009-mobile-app-timing.md) | Native mobile app deferred to a later phase | Accepted |
 | [0010](0010-dummy-discovery-feed-prototype.md) | Dummy-data discovery feed prototype (feed, follow, location, chat) | Accepted |
+| [0011](0011-feed-layout-instagram-style.md) | Feed layout: single-column scroll (Instagram-style), product likes | Accepted |
 
 ### Implementation supplements (superseded numbering)
 

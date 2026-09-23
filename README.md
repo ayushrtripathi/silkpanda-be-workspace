@@ -1,64 +1,47 @@
-# SilkPanda — Phase 1 MVP
+# SilkPanda — Architecture Decision Records
 
-Backend component of SkillPanda (a Swiggy for saree shops): a shop-enablement web app where each saree shop gets a branded storefront (`silkpanda.com/<shop-slug>`). Buyers browse and enquire via WhatsApp — no payments, no cross-shop search in Phase 1.
+This folder tracks major product, business, and technical decisions for SilkPanda as they're made. Each ADR is a standalone file, numbered sequentially, and stays even after it's superseded — we update `Status` rather than deleting history.
 
-**Stack:** Next.js (App Router) · Tailwind CSS · Supabase (Postgres, Auth, Storage)
+## Status values
+- **Proposed** — under discussion, not yet locked
+- **Accepted** — decided, currently in effect
+- **Superseded by ADR-XXXX** — replaced by a later decision
+- **Deprecated** — no longer relevant, kept for history
 
-Architecture decisions (ADR-0001–0010) live in [`decisions/`](./decisions/README.md).
+## Index
 
-## Quick start
+| ADR | Title | Status |
+|---|---|---|
+| [0001](0001-platform-strategy.md) | Platform strategy: SaaS-first, defer marketplace | Accepted |
+| [0002](0002-phase1-monetization.md) | Phase 1 monetization: free/low-friction, not subscription | Accepted |
+| [0003](0003-tech-stack.md) | Tech stack: Next.js, Supabase backend, no native app | Accepted (amended) |
+| [0004](0004-no-payments-phase1.md) | No in-app payment handling in Phase 1 | Accepted |
+| [0005](0005-team-and-hiring.md) | No hiring pre-traction; solo + informal help only | Accepted |
+| [0006](0006-phase1-scope.md) | Phase 1 feature scope and build sequence | Accepted |
+| [0007](0007-image-storage.md) | Image/media storage strategy | Proposed |
+| [0008](0008-repo-structure.md) | Repository structure: single repo | Accepted |
+| [0009](0009-mobile-app-timing.md) | Native mobile app deferred to a later phase | Accepted |
+| [0010](0010-dummy-discovery-feed-prototype.md) | Dummy-data discovery feed prototype (feed, follow, location, chat) | Accepted |
+| [0011](0011-feed-layout-instagram-style.md) | Feed layout: Instagram-style single-column scroll + like feature | Accepted |
 
-### 1. Supabase (automated)
+## How to add a new ADR
+Copy the template below, number it sequentially, add a row to the index above.
 
-Create a [Supabase access token](https://supabase.com/dashboard/account/tokens), then from the repo root:
+```markdown
+# ADR-XXXX: <Title>
 
-```powershell
-$env:SUPABASE_ACCESS_TOKEN = "sbp_your_token"
-npm run supabase:setup
+**Status:** Proposed | Accepted | Superseded | Deprecated
+**Date:** <YYYY-MM-DD>
+
+## Context
+What situation/problem led to this decision being needed.
+
+## Decision
+What we decided, stated plainly.
+
+## Alternatives Considered
+Other options and why they were rejected (or deferred).
+
+## Consequences
+What this makes easier, what it makes harder, what it defers or forecloses.
 ```
-
-This creates/links project `silkpanda-mvp`, applies migrations, writes `.env.local`, and seeds a demo shop owner + `demo-sarees` catalog. Details: [`supabase/SETUP.md`](./supabase/SETUP.md).
-
-**Manual alternative:** run [`supabase/schema.sql`](./supabase/schema.sql) in the SQL Editor, copy keys into `.env.local`, then `npm run supabase:bootstrap`.
-
-### 2. Environment
-
-### 3. Run locally
-
-```bash
-npm install
-npm run dev
-```
-
-- Landing: [http://localhost:3000](http://localhost:3000)
-- Shop login: [http://localhost:3000/login](http://localhost:3000/login)
-- Storefront: [http://localhost:3000/demo-sarees](http://localhost:3000/demo-sarees)
-
-### 4. Deploy
-
-Push to GitHub and connect the repo to [Vercel](https://vercel.com). Set the same Supabase env vars in Vercel project settings.
-
-## Project structure
-
-```
-app/
-  (admin)/login          Shop owner auth
-  (admin)/dashboard      Stats + product CRUD
-  [shopSlug]/            Public storefront + product detail
-components/              ProductCard, EnquireButton, ImageUpload, …
-lib/supabase/            Browser + server Supabase clients
-supabase/schema.sql      Database schema + RLS policies
-decisions/               ADR-0001 … ADR-0007
-```
-
-## Phase 1 scope (in / out)
-
-| In scope | Out of scope |
-|----------|--------------|
-| Per-shop catalog URLs | Cross-shop discovery |
-| Product CRUD + images | Payments / checkout |
-| Fabric / occasion / price filters | Buyer accounts |
-| WhatsApp enquire + click analytics | Native app |
-| Shop owner dashboard | Self-serve shop signup |
-
-See [`decisions/`](./decisions/README.md) for ADRs that define Phase 1 scope and stack choices.

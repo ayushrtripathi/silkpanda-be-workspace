@@ -1,3 +1,5 @@
+import { productArtifactAt } from "@/lib/products/artifact-images";
+
 export interface DiscoveryShop {
   id: string;
   name: string;
@@ -26,21 +28,21 @@ export const DUMMY_SHOPS: DiscoveryShop[] = [
     name: "Lakshmi Silks",
     city: "Chennai",
     tagline: "Kanjeevaram for every occasion",
-    imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550783c08?w=400&q=80",
+    imageUrl: productArtifactAt(0),
   },
   {
     id: "s2",
     name: "Banaras House",
     city: "Hyderabad",
     tagline: "Banarasi weaves, direct from weavers",
-    imageUrl: "https://images.unsplash.com/photo-1583292650898-7d22cd406021?w=400&q=80",
+    imageUrl: productArtifactAt(1),
   },
   {
     id: "s3",
     name: "Silk Route",
     city: "Bengaluru",
     tagline: "Contemporary silks under ₹8k",
-    imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e3361?w=400&q=80",
+    imageUrl: productArtifactAt(2),
   },
 ];
 
@@ -53,7 +55,7 @@ export const DUMMY_POSTS: DiscoveryPost[] = [
     title: "Temple border Kanjeevaram — maroon",
     price: 22400,
     fabric: "Kanjeevaram",
-    imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550783c08?w=600&q=80",
+    imageUrl: productArtifactAt(0),
   },
   {
     id: "p2",
@@ -63,7 +65,7 @@ export const DUMMY_POSTS: DiscoveryPost[] = [
     title: "Gold zari festive saree",
     price: 18900,
     fabric: "Banarasi",
-    imageUrl: "https://images.unsplash.com/photo-1583292650898-7d22cd406021?w=600&q=80",
+    imageUrl: productArtifactAt(1),
   },
   {
     id: "p3",
@@ -73,7 +75,7 @@ export const DUMMY_POSTS: DiscoveryPost[] = [
     title: "Office-friendly linen blend",
     price: 4200,
     fabric: "Linen",
-    imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e3361?w=600&q=80",
+    imageUrl: productArtifactAt(2),
   },
   {
     id: "p4",
@@ -83,6 +85,6 @@ export const DUMMY_POSTS: DiscoveryPost[] = [
     title: "Bridal red — tissue silk",
     price: 35600,
     fabric: "Silk",
-    imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550783c08?w=600&q=80",
+    imageUrl: productArtifactAt(3),
   },
 ];

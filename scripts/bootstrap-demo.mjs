@@ -3,6 +3,10 @@
  * Requires SUPABASE_SERVICE_ROLE_KEY — never expose to the browser.
  */
 import { createClient } from "@supabase/supabase-js";
+import {
+  productArtifactAt,
+  withArtifactImages,
+} from "./lib/artifact-images.mjs";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -111,11 +115,25 @@ async function main() {
       },
     ];
 
-    const { error: productsError } = await admin.from("products").insert(samples);
+    const { error: productsError } = await admin
+      .from("products")
+      .insert(withArtifactImages(samples, 0));
     if (productsError) throw productsError;
     console.log(`Inserted ${samples.length} sample products.`);
   } else {
-    console.log(`Products already exist (${count}); skipping sample insert.`);
+    const { data: existing } = await admin
+      .from("products")
+      .select("id, image_urls")
+      .eq("shop_id", shop.id);
+    for (const [i, product] of (existing ?? []).entries()) {
+      const urls = product.image_urls ?? [];
+      if (urls.length > 0 && urls[0]) continue;
+      await admin
+        .from("products")
+        .update({ image_urls: [productArtifactAt(i)] })
+        .eq("id", product.id);
+    }
+    console.log(`Products already exist (${count}); images synced if missing.`);
   }
 
   console.log("\nLogin credentials for /login:");

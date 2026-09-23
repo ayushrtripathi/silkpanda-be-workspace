@@ -11,7 +11,9 @@
     "supabase:link-push": "powershell -ExecutionPolicy Bypass -File ./scripts/link-and-push.ps1",
     "supabase:push": "supabase db push",
     "supabase:bootstrap": "node ./scripts/bootstrap-demo.mjs",
-    "supabase:seed-discovery": "node ./scripts/seed-discovery-shops.mjs"
+    "supabase:seed-discovery": "node ./scripts/seed-discovery-shops.mjs",
+    "artifacts:sync": "node ./scripts/sync-artifacts-from-disk.mjs",
+    "products:sync-images": "node ./scripts/sync-product-artifact-images.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

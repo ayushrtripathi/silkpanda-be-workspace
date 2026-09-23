@@ -5,6 +5,7 @@
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { createClient } from "@supabase/supabase-js";
+import { productArtifactAt, withArtifactImages } from "./lib/artifact-images.mjs";
 
 function loadEnvLocal() {
   try {
@@ -140,6 +141,8 @@ async function getOrCreateOwner(email) {
 }
 
 async function main() {
+  let globalProductIndex = 0;
+
   for (const shop of SHOPS) {
     const ownerId = await getOrCreateOwner(shop.email);
     const { data: row, error: shopError } = await admin
@@ -166,13 +169,30 @@ async function main() {
       .eq("shop_id", row.id);
 
     if ((count ?? 0) === 0) {
-      const { error: prodError } = await admin.from("products").insert(
-        shop.products.map((p) => ({ ...p, shop_id: row.id, image_urls: [] })),
+      const payload = withArtifactImages(
+        shop.products.map((p) => ({ ...p, shop_id: row.id })),
+        globalProductIndex,
       );
+      globalProductIndex += payload.length;
+      const { error: prodError } = await admin.from("products").insert(payload);
       if (prodError) throw prodError;
       console.log(`Inserted products for /${row.slug}`);
     } else {
-      console.log(`Products exist for /${row.slug}`);
+      const { data: existing } = await admin
+        .from("products")
+        .select("id, image_urls")
+        .eq("shop_id", row.id);
+      for (const [i, product] of (existing ?? []).entries()) {
+        const urls = product.image_urls ?? [];
+        if (urls.length > 0 && urls[0]) continue;
+        const path = productArtifactAt(globalProductIndex + i);
+        await admin
+          .from("products")
+          .update({ image_urls: [path] })
+          .eq("id", product.id);
+      }
+      globalProductIndex += (existing ?? []).length;
+      console.log(`Products exist for /${row.slug} (images synced if missing)`);
     }
 
     console.log(`Shop /${row.slug} → login ${shop.email}`);

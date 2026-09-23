@@ -4,7 +4,7 @@ import type {
   DiscoveryPostFeed,
   DiscoveryShopFeed,
 } from "@/lib/prototype/discovery-types";
-import { placeholderForFabric } from "@/lib/prototype/placeholders";
+import { productArtifactForKey } from "@/lib/products/artifact-images";
 import { DiscoveryPrototype } from "./DiscoveryPrototype";
 
 export const dynamic = "force-dynamic";
@@ -64,7 +64,7 @@ export default async function DiscoveryPrototypePage() {
       price: p.price != null ? Number(p.price) : null,
       fabric: p.fabric,
       imageUrl:
-        p.image_urls?.[0] ?? placeholderForFabric(p.fabric),
+        p.image_urls?.[0] ?? productArtifactForKey(p.id),
     };
   });
 
@@ -80,10 +80,6 @@ export default async function DiscoveryPrototypePage() {
   }
 
   return (
-    <DiscoveryPrototype
-      shops={feedShops}
-      posts={feedPosts}
-      seededInDatabase={feedShops.length > 0}
-    />
+    <DiscoveryPrototype shops={feedShops} posts={feedPosts} />
   );
 }
